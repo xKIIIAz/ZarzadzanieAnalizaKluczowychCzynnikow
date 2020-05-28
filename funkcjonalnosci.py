@@ -42,12 +42,13 @@ def write_elements_to_sheet(lista_czynnikow, lista_wag, lista_ocen, lista_wyniko
 def exporter(lista_czynnikow, lista_wag, lista_ocen, lista_wynikow, nazwa_firmy, liczba_firm):
     '''
     funkcja tworzy zeszyt z podanymi danymi firmy
+    ostatni argument informuje o liczbie worksheetow z duplikowanymi danymi podanymi 
+    w pozostałych argumentach
     input:
         lista_czynnikow - lista stringow
         lista_wag       - lista floatow
         lista_ocen      - lista integerow
         nazwa_firmy     - string
-
     return:
         Workbook: wb    - zeszyt Excel
     '''
@@ -82,19 +83,7 @@ def czytaj_skladniki(working_sheet, koordynaty_tytulowej_komorki, liczba_czynnik
     for roww in range(row, row + liczba_czynnikow):
         lista_skladnikow.append(working_sheet.cell(row = roww, column = column).value)
     return lista_skladnikow
-'''
-def licz_wyniki(lista_wag, lista_ocen):
-    
-    funkcja liczy wyniki, tj waga * ocena i dla kazdej cechy wynik dodaje do listy.
-    input:
-        lista_wag   - musi byc int, nie moze byc string
-        lista_ocen  - jw.
-    return:
-        lista wynikow w postaci float 
 
-    #lepiej podobno to zastapic numpy'em albo jakąś lepszą funkcją ktora pochodzi od C
-    return [x * y  for x, y in zip(lista_wag, lista_ocen)]
-'''
 def importer(wb, nr_firmy): #nr_firmy od zera
     '''
     funkcja sczytuje dane na temat firmy z arkusza excel. przykladowy format dokumentu
@@ -102,9 +91,12 @@ def importer(wb, nr_firmy): #nr_firmy od zera
     input:
         nazwa_pliku - sciezka do arkusza ktory chcemy otworzyc
     return
-        czteroelementowa lista list - wszystkie dane analizy z arkusza
+        piecioelementowa lista list - wszystkie dane analizy z arkusza:
+
+        nazwa_firmy, lista_czynnikow, lista_wag, lista_ocen, lista_wynikow
     '''
     #wb = load_workbook(filename = nazwa_pliku,read_only=True)
+    #print("importuje")
     names = wb.sheetnames
     if nr_firmy >= len(names):
         raise ValueError("Niepoprawny nr firmy.")
@@ -141,14 +133,19 @@ def importer(wb, nr_firmy): #nr_firmy od zera
     return nazwa_firmy, lista_czynnikow, lista_wag, lista_ocen, lista_wynikow
 
 def daj_przykladowe_dane():
+    '''
+    ostatni zwracany argument to liczba firm w dokumencie przykładowym
+    '''
+
     lista_ocen = [2,3,4]
     lista_wag = [0.2,0.3,0.5]
     lista_wynikow = [0.4,0.9,2]
     nazwa_firmy = "nazwa_firmy"
     lista_czynnikow = ["czynnik 1", "czynnik 2", "czynnik 3"]
-    return lista_czynnikow, lista_wag, lista_ocen, lista_wynikow, nazwa_firmy, 4
+    return lista_czynnikow, lista_wag, lista_ocen, lista_wynikow, nazwa_firmy, 2
 
-def wykres_wynikow_firm(lista_firm): # lista tupli list. zajebiscie. # potrzebna jeszcze nazwa firmy w liscie
+def wykres_wynikow_firm(lista_firm): # lista tupli list. # potrzebna jeszcze nazwa firmy w liscie
+    
     pass
 
 if __name__ == "__main__":
