@@ -13,6 +13,12 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 import numpy as np
 
+'''
+solution to not being able to save excel file while the program is running:
+https://stackoverflow.com/questions/31416842/openpyxl-does-not-close-excel-workbook-in-read-only-mode
+'''
+
+
 class MainWindow(Ui):
 
     '''

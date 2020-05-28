@@ -19,6 +19,8 @@ def full_import(filepath):
         firma = importer(wb,i)
         licz_wyniki(firma)
         dane_firm.append(firma)
+    wb.close()
+    del wb
     return dane_firm
 
 def write_elements_to_sheet(lista_czynnikow, lista_wag, lista_ocen, lista_wynikow, nazwa_firmy, ws):
@@ -61,11 +63,12 @@ def exporter(lista_czynnikow, lista_wag, lista_ocen, lista_wynikow, nazwa_firmy,
             ws = wb.create_sheet(nazwa_firmy + str(i))
             ws = write_elements_to_sheet(lista_czynnikow, lista_wag, lista_ocen, lista_wynikow,nazwa_firmy, ws)
     wb.save(filename)
+    wb.close()
+    del wb
     print("zapisano")
 
 def czytaj_skladniki_czynnikow(working_sheet, koordynaty_tytulowej_komorki):
     #zwraca czynninki i liczbe czynnikow
-
     lista_skladnikow = []
     column = koordynaty_tytulowej_komorki[1]
     row = koordynaty_tytulowej_komorki[0] + 1
@@ -148,13 +151,3 @@ def wykres_wynikow_firm(lista_firm): # lista tupli list. # potrzebna jeszcze naz
     
     pass
 
-if __name__ == "__main__":
-    '''
-    x = daj_przykladowe_dane()
-    print(x)
-    exporter(x[0],x[1],x[2],x[3],x[4],x[5])
-    '''
-    dane_firm = full_import("Dane.xlsx")
-    for i in dane_firm:
-        print(i)
-    #print(dane_firm)
