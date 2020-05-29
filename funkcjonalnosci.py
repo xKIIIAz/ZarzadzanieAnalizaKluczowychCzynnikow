@@ -1,5 +1,6 @@
 from openpyxl.styles import Alignment
 from openpyxl import Workbook, load_workbook
+import io
 
 #co jezeli nazwa firmy juz figuruje w liscie firm?
 #lista_czynnikow, lista_wag, lista_ocen,
@@ -12,7 +13,9 @@ def licz_wyniki(lista_danych):
    # return lista_danych
 
 def full_import(filepath):
-    wb = load_workbook(filename=filepath, read_only=True)
+    with open(filepath, "rb") as f:
+        file = io.BytesIO(f.read())
+    wb = load_workbook(file, read_only=True)
     names = wb.sheetnames
     dane_firm = []
     for i in range(len(names)):

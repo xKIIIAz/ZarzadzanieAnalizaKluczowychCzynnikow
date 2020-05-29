@@ -69,7 +69,8 @@ class MainWindow(Ui):
         sc = MplCanvas(self)
         for dane in self.dane_firm:
             sc.axes.plot(dane[1],dane[4],label = dane[0], linewidth = 4)
-        sc.axes.text(1,3.6,"Wyniki firm względem czynników", horizontalalignment = 'center', verticalalignment = 'center', fontsize=12)
+        #sc.axes.text(1,3.6,"Wyniki firm względem czynników", horizontalalignment = 'center', verticalalignment = 'center', fontsize=12)
+        sc.axes.set_title("Wykres wyników firm względem czynników.")
         sc.axes.legend()
         layout.addWidget(sc)
         self.wykresGlowny.setLayout(layout)
@@ -102,10 +103,20 @@ class MainWindow(Ui):
             QObjectCleanupHandler().add(self.wykresPrawyDol.layout())
         layout = QtWidgets.QVBoxLayout()
         sc = MplCanvas(self)
+        wyniki = []
+        labele = []
         for dane in self.dane_firm:
-            sc.axes.plot(dane[1],dane[4],label = dane[0], linewidth = 4)
+            wyniki.append(sum(dane[4]))
+            labele.append(dane[0])
+        wyniki = np.array(wyniki)
+        labele = np.array(labele)
+        print(type(wyniki))
+        print(type(labele))
+        print(wyniki)
+        print(labele)
+        sc.axes.pie(x = wyniki,labels = labele)
         #sc.axes.text(1,3.6,"Wyniki firm względem czynników", horizontalalignment = 'center', verticalalignment = 'center', fontsize=12)
-        sc.axes.legend()
+        sc.axes.set_title("Udział w wynikach każdej z firm")
         layout.addWidget(sc)
         self.wykresPrawyDol.setLayout(layout)
 
