@@ -2,8 +2,18 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sys
 import os
+import ctypes
 class Ui_MainWindow(QtWidgets.QMainWindow): 
     def setupUi(self, MainWindow):
+        myappid = u'wat.analizakluczowychczynnikow.zarzadzanie' # arbitrary string
+        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+        icon = QtGui.QIcon()
+        icon.addFile("icon16x16.png", QtCore.QSize(16,16))
+        icon.addFile("icon24x24.png", QtCore.QSize(24,24))
+        icon.addFile("icon32x32.png", QtCore.QSize(32,32))
+        icon.addFile("icon48x48.png", QtCore.QSize(48,48))
+        icon.addFile("icon255x255.png",QtCore.QSize(255,255))
+        self.setWindowIcon(icon)
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1075, 707)
         self.setFixedSize(1075, 747)
