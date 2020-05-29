@@ -5,9 +5,17 @@ class Plotter:
     def licz_dane_do_wykresu_slupkowego(dane_firm):
         nazwy_firm = []
         sumy_wynikow_firm = []
+        paczka = []
         for x in dane_firm:
+            tupla = []
+            tupla.append(x[0])
+            tupla.append(sum(filter(None,x[4])))
+            paczka.append(tupla)
+        paczka.sort(key= lambda x: x[1], reverse = True)
+        print("Paczka: ", paczka)
+        for x in paczka:
             nazwy_firm.append(x[0])
-            sumy_wynikow_firm.append(sum(filter(None,x[4])))
+            sumy_wynikow_firm.append(x[1])
         return nazwy_firm, sumy_wynikow_firm
     
     @staticmethod
