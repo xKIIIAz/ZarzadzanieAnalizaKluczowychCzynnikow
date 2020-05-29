@@ -25,10 +25,8 @@ class MainWindow(Ui):
     here is a logic of a program
     todo:
     - handler for exception if someone clicks X when opening or saving a file
-    - handlers for buttons underneath the plots
-    - dwo additional plots - I'm doing it now
-    - add an excel file to a workbook
-    - add function "addListeners"
+    - handler for editing a workbook
+    - add function "addListeners" // not that important, but would add more readability
 
     '''
     
