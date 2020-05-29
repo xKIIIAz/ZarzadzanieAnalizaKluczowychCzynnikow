@@ -35,14 +35,12 @@ class MainWindow(Ui):
     flaga_stworzono_przykladowy = False
     filepath = ""
     dane_firm = []
-    ranking_firm = []
 
     def __init__(self):
         super(MainWindow, self).__init__()
         Ui.setupUi(self, self)
         self.filepath = "Dane.xlsx"
         data_file = Path("Dane.xlsx")
-        print(data_file)
         if data_file.is_file():
             self.flaga_istnieje_plik = True
             self.dane_firm = f.full_import(self.filepath)
@@ -53,8 +51,8 @@ class MainWindow(Ui):
             f.exporter(x[0],x[1],x[2],x[3],x[4],x[5])
             self.flaga_stworzono_przykladowy = True
             self.flaga_istnieje_plik = True
-        for x in self.dane_firm:
-            print(x)
+        #for x in self.dane_firm:
+        #    print(x)
         self.odswiez()
         #self.workbook.close()
  
@@ -65,24 +63,16 @@ class MainWindow(Ui):
         if layout != None:
             QObjectCleanupHandler().add(self.wykresGlowny.layout())
         layout = QtWidgets.QVBoxLayout()
-        sc = MplCanvas(self)
+        self.scGlowny = MplCanvas(self)
         for dane in self.dane_firm:
-            sc.axes.plot(dane[1],dane[4],label = dane[0], linewidth = 4)
+            self.scGlowny.axes.plot(dane[1],dane[4],label = dane[0], linewidth = 4)
         #sc.axes.text(1,3.6,"Wyniki firm względem czynników", horizontalalignment = 'center', verticalalignment = 'center', fontsize=12)
-        sc.axes.set_title("Wykres wyników firm względem czynników.")
-        sc.axes.legend()
-        layout.addWidget(sc)
+        self.scGlowny.axes.set_title("Wykres wyników firm względem czynników.")
+        self.scGlowny.axes.legend()
+        self.scGlowny.correct_ticks()
+        layout.addWidget(self.scGlowny)
         self.wykresGlowny.setLayout(layout)
-    '''
-    def dodaj_wykres_prawy_gora(self):
-        layout1 = QtWidgets.QHBoxLayout()
-        barplot = MplCanvas(self)
-        pos = np.arange(len(self.ranking_firm))
-        width = 0.35
-        barplot.axes.bar(pos, self.ranking_firm[1], align = 'center', width = width)
-        layout1.addWidget(barplot)
-        self.wykresPrawyGora.setLayout(layout1)
-    '''
+
     def dodaj_wykres_prawy_gora(self):
         Plotter.draw_and_print(self.dane_firm)
         layout = self.wykresPrawyGora.layout()
@@ -101,7 +91,7 @@ class MainWindow(Ui):
         if layout != None:
             QObjectCleanupHandler().add(self.wykresPrawyDol.layout())
         layout = QtWidgets.QVBoxLayout()
-        sc = MplCanvas(self)
+        self.scPie = MplCanvas(self)
         wyniki = []
         labele = []
         for dane in self.dane_firm:
@@ -109,42 +99,17 @@ class MainWindow(Ui):
             labele.append(dane[0])
         wyniki = np.array(wyniki)
         labele = np.array(labele)
-        print(type(wyniki))
-        print(type(labele))
-        print(wyniki)
-        print(labele)
-        sc.axes.pie(x = wyniki,labels = labele)
+        self.scPie.axes.pie(x = wyniki,labels = labele)
         #sc.axes.text(1,3.6,"Wyniki firm względem czynników", horizontalalignment = 'center', verticalalignment = 'center', fontsize=12)
-        sc.axes.set_title("Udział w wynikach każdej z firm")
-        layout.addWidget(sc)
+        self.scPie.axes.set_title("Udział w wynikach każdej z firm")
+        layout.addWidget(self.scPie)
         self.wykresPrawyDol.setLayout(layout)
-
-    def wylicz_ranking(self):
-        '''
-        funkcja wylicza sume wynikow kazdej z firm i umieszcza na liscie ranking_firm w postaci par
-        tzn.:
-        [ [nazwa_firmy, laczny_wynik] , [nazwa_firmy, laczny_wynik], ..., [nazwa_firmy, laczny_wynik] ]
-        zmiana:
-        Umieszcza je w postaci:
-        [ [nazwa_firmy, nazwa_firmy1..., nazwa_firmyN] , [laczny_wynik, laczny_wynik1, ..., laczny_wynikN] ]
-        '''
-        self.ranking_firm = []
-        for x in self.dane_firm:
-            firma = []
-            firma.append(x[0])
-            self.ranking_firm.append(firma)
-        for x in self.dane_firm:
-            firma = []
-            firma.append(sum(filter(None,x[4])))
-            self.ranking_firm.append(firma)
-        print(self.ranking_firm)
             
     def czytaj_dane(self):
         self.dane_firm = [x for x in f.full_import(self.filepath)]
 
     def odswiez(self):
         self.czytaj_dane()
-        self.wylicz_ranking()
         self.dodaj_wykres_glowny()
         self.dodaj_wykres_prawy_gora()
         self.dodaj_wykres_prawy_dolny()
@@ -157,17 +122,34 @@ class MainWindow(Ui):
         or if the file is already opened, sets focus to that
         excel window.
         '''
-        command = "start " + self.filename
-        if not showexcel.show_excel_window(self.filename):
+        command = "start " + self.filepath
+        if not showexcel.show_excel_window(self.filepath):
             os.system(command)
 
     def otworz_wybrany_excel(self):
-        self.filename = self.openExcelFileNameDialog()
-        if filename != None:
-            self.workbook = f.load_workbook(self.filename)
+        self.filepath = self.openExcelFileNameDialog()
+        if self.filepath != None:
+            self.workbook = f.load_workbook(self.filepath)
         self.odswiez()
 
+    def eksportuj_wykres_glowny(self):
+        filepath = self.saveWykresDialog("wykres_wyniki_czynniki")
+        if filepath == None or filepath == "":
+            return
+        else:
+            self.scGlowny.export(filepath)
+
+    def eksportuj_wykres_kolowy(self):
+        filepath = self.saveWykresDialog("wykres_kolowy")
+        if filepath == None or filepath == "":
+            return
+        else:
+            self.scPie.export(filepath)
+
     def zapisz_aktualny_arkusz(self):
+        '''
+        deprecated, do not use...
+        '''
         savename = self.saveArkuszDialog()
         self.workbook.save(savename)
 
@@ -181,11 +163,10 @@ class MainWindow(Ui):
         else:
             return None  
         
-    def saveArkuszDialog(self):
+    def saveWykresDialog(self, nazwa_pliku):
         options = QtWidgets.QFileDialog.Options()
-        fileName, _ = QtWidgets.QFileDialog.getSaveFileName(self,"Zapisz arkusz jako...","dane_firm","Excel Files (*.xlsx)", options=options)
-        if fileName:
-            return fileName
+        fileName, _ = QtWidgets.QFileDialog.getSaveFileName(self,"Zapisz wykres jako...",nazwa_pliku,"PNG files (*.png)", options=options)
+        return fileName
             
 class Canvas(FigureCanvas):
     def __init__(self, parent = None, width = 5, height = 4, dpi=100):
@@ -200,9 +181,16 @@ class Canvas(FigureCanvas):
 
 class MplCanvas(FigureCanvas):
     def __init__(self, parent=None, width=5, height=4, dpi=100):
-        fig = Figure(figsize=(width, height), dpi=dpi)
-        self.axes = fig.add_subplot(111)
-        super(MplCanvas, self).__init__(fig)
+        self.fig = Figure(figsize=(width, height), dpi=dpi)
+        self.axes = self.fig.add_subplot(111)
+        super(MplCanvas, self).__init__(self.fig)
+    def correct_ticks(self):
+        for xtick in self.axes.get_xticklabels():
+            xtick.set_rotation(20)
+
+    def export(self, filepath):
+        self.fig.savefig(filepath)
+    
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication([])
