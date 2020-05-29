@@ -1,7 +1,8 @@
-
+import showexcel
 from plotdrawer import Plotter
 from gui import Ui_MainWindow as Ui
 from gui import QtWidgets
+from gui import os
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtCore import Qt
 from PyQt5.QtCore import QObjectCleanupHandler
@@ -149,6 +150,16 @@ class MainWindow(Ui):
         self.dodaj_wykres_prawy_dolny()
         #self.dodaj_wykres_glowny()
         #self.dodaj_wykres_prawy_gora()
+
+    def edytuj_excel(self):
+        '''
+        opens excel file under the specified filename
+        or if the file is already opened, sets focus to that
+        excel window.
+        '''
+        command = "start " + self.filename
+        if not showexcel.show_excel_window(self.filename):
+            os.system(command)
 
     def otworz_wybrany_excel(self):
         self.filename = self.openExcelFileNameDialog()
