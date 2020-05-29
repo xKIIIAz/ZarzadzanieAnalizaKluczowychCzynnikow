@@ -12,7 +12,6 @@ class Plotter:
             tupla.append(sum(filter(None,x[4])))
             paczka.append(tupla)
         paczka.sort(key= lambda x: x[1], reverse = True)
-        print("Paczka: ", paczka)
         for x in paczka:
             nazwy_firm.append(x[0])
             sumy_wynikow_firm.append(x[1])
