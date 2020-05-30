@@ -80,7 +80,7 @@ class MainWindow(Ui):
             QObjectCleanupHandler().add(self.wykresPrawyGora.layout())
         layout = QtWidgets.QVBoxLayout()
         label = QtWidgets.QLabel(self)
-        pixmap = QPixmap('fig.png')
+        pixmap = QPixmap('plt/fig.png')
         pixmap = pixmap.scaled(451,331, Qt.KeepAspectRatio, Qt.FastTransformation)
         label.setPixmap(pixmap)
         layout.addWidget(label)

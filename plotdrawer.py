@@ -29,6 +29,6 @@ class Plotter:
         bars = plt.bar(nazwy_firm,sumy_wynikow_firm, width=0.6,color='gray')
         bars[index].set_color('magenta')
         plt.title("Podsumowanie wyników względem firm")
-        plt.savefig("fig.png")
+        plt.savefig("plt/fig.png")
         plt.clf()
     
