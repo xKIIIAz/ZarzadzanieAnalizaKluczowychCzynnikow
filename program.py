@@ -6,7 +6,7 @@ from gui import os
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtCore import Qt
 from PyQt5.QtCore import QObjectCleanupHandler
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 import funkcjonalnosci as f
 import matplotlib
 matplotlib.use('Qt5Agg')
@@ -80,7 +80,7 @@ class MainWindow(Ui):
             QObjectCleanupHandler().add(self.wykresPrawyGora.layout())
         layout = QtWidgets.QVBoxLayout()
         label = QtWidgets.QLabel(self)
-        pixmap = QPixmap('plt/fig.png')
+        pixmap = QPixmap('plt/bar_chart.png')
         pixmap = pixmap.scaled(451,331, Qt.KeepAspectRatio, Qt.FastTransformation)
         label.setPixmap(pixmap)
         layout.addWidget(label)
@@ -99,7 +99,7 @@ class MainWindow(Ui):
             labele.append(dane[0])
         wyniki = np.array(wyniki)
         labele = np.array(labele)
-        self.scPie.axes.pie(x = wyniki,labels = labele)
+        self.scPie.axes.pie(x = wyniki,labels = labele, autopct='%1.1f%%')
         #sc.axes.text(1,3.6,"Wyniki firm względem czynników", horizontalalignment = 'center', verticalalignment = 'center', fontsize=12)
         self.scPie.axes.set_title("Udział w wynikach każdej z firm")
         layout.addWidget(self.scPie)
@@ -122,16 +122,32 @@ class MainWindow(Ui):
         or if the file is already opened, sets focus to that
         excel window.
         '''
-        command = "start " + self.filepath
-        if not showexcel.show_excel_window(self.filepath):
+        print(self.filepath)
+        p = str(PureWindowsPath(self.filepath))
+        command = "start " + "\"title\" " + "\"" + p + "\""
+        print(command)
+        if not showexcel.show_excel_window(os.path.basename(self.filepath)):
             os.system(command)
 
     def otworz_wybrany_excel(self):
-        self.filepath = self.openExcelFileNameDialog()
-        if self.filepath != None:
+        new_filepath = self.openExcelFileNameDialog()
+        if new_filepath == None or new_filepath == "":
+            pass
+        else:
+            self.filepath = new_filepath
             self.workbook = f.load_workbook(self.filepath)
         self.odswiez()
 
+    def openExcelFileNameDialog(self):
+        options = QtWidgets.QFileDialog.Options()
+        #options |= QtWidgets.QFileDialog.DontUseNativeDialog
+        fileName, odd = QtWidgets.QFileDialog.getOpenFileName(self,"Wybierz dokument excel z danymi.", "Dane","Excel Files (*.xlsx)", options=options)
+        if fileName != None:
+            print("none")
+            return fileName
+        else:
+            return None 
+    
     def eksportuj_wykres_glowny(self):
         filepath = self.saveWykresDialog("wykres_wyniki_czynniki")
         if filepath == None or filepath == "":
@@ -152,32 +168,11 @@ class MainWindow(Ui):
         '''
         savename = self.saveArkuszDialog()
         self.workbook.save(savename)
-
-    def openExcelFileNameDialog(self):
-        options = QtWidgets.QFileDialog.Options()
-        #options |= QtWidgets.QFileDialog.DontUseNativeDialog
-        fileName, odd = QtWidgets.QFileDialog.getOpenFileName(self,"Wybierz dokument excel z danymi.", "Dane","Excel Files (*.xlsx)", options=options)
-        if fileName != None:
-            print("none")
-            return fileName
-        else:
-            return None  
         
     def saveWykresDialog(self, nazwa_pliku):
         options = QtWidgets.QFileDialog.Options()
         fileName, _ = QtWidgets.QFileDialog.getSaveFileName(self,"Zapisz wykres jako...",nazwa_pliku,"PNG files (*.png)", options=options)
         return fileName
-            
-class Canvas(FigureCanvas):
-    def __init__(self, parent = None, width = 5, height = 4, dpi=100):
-        fig = Figure(figsize=(width,height),dpi=dpi)
-        self.axes = fig.add_subplot(111)
-        FigureCanvas.__init__(self,fig)
-        self.setParent(parent)
-    def plot(self, vals, labels,):
-        ax = self.figure.add_subplot(111)
-        ax.pie(vals, labels=labels)
-        return ax
 
 class MplCanvas(FigureCanvas):
     def __init__(self, parent=None, width=5, height=4, dpi=100):
