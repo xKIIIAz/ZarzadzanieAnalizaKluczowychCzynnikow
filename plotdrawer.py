@@ -56,7 +56,6 @@ class Plotter:
         Plotter.autolabel(bars)
         plt.title("Podsumowanie wyników względem firm")
         plt.savefig(filepath, dpi = 300)
-        plt.savefig("plt/bar_chart.pdf")
         plt.clf()
     
     @staticmethod
@@ -78,7 +77,6 @@ class Plotter:
         pie = plt.pie(x = wyniki, labels = labele, explode = explode, shadow = False, autopct='%1.1f%%')
         plt.title("Udział w wynikach każdej z firm")
         plt.savefig(filepath, dpi = 300)
-        plt.savefig("plt/pie_chart.pdf")
         plt.clf()
     
     @staticmethod
@@ -94,5 +92,4 @@ class Plotter:
             tic.set_rotation(20)
         plt.subplots_adjust(bottom=0.2)
         plt.savefig(filepath, dpi = 300, pad_inches = 50)
-        plt.savefig("plt/plot.pdf")
         plt.clf()
