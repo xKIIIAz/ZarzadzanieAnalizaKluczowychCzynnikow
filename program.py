@@ -157,14 +157,21 @@ class MainWindow(Ui):
         if filepath == None or filepath == "":
             return
         else:
-            self.scGlowny.export(filepath)
+            Plotter.export_plot(self.dane_firm, filepath)
 
     def eksportuj_wykres_kolowy(self):
         filepath = self.saveWykresDialog("wykres_kolowy")
         if filepath == None or filepath == "":
             return
         else:
-            self.scPie.export(filepath)
+            Plotter.export_pie_chart(self.dane_firm, filepath)
+
+    def eksportuj_wykres_slupkowy(self):
+        filepath = self.saveWykresDialog("wykres_slupkowy")
+        if filepath == None or filepath == "":
+            return
+        else:
+            Plotter.export_bar_chart(self.dane_firm,filepath)
 
     def zapisz_aktualny_arkusz(self):
         '''
@@ -175,7 +182,7 @@ class MainWindow(Ui):
         
     def saveWykresDialog(self, nazwa_pliku):
         options = QtWidgets.QFileDialog.Options()
-        fileName, _ = QtWidgets.QFileDialog.getSaveFileName(self,"Zapisz wykres jako...",nazwa_pliku,"PNG files (*.png)", options=options)
+        fileName, _ = QtWidgets.QFileDialog.getSaveFileName(self,"Zapisz wykres jako...",nazwa_pliku,"PNG files (*.png);; PDF files (*.pdf)", options=options)
         return fileName
 
 class MplCanvas(FigureCanvas):
