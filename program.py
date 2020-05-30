@@ -68,6 +68,7 @@ class MainWindow(Ui):
             self.scGlowny.axes.plot(dane[1],dane[4],label = dane[0], linewidth = 4)
         #sc.axes.text(1,3.6,"Wyniki firm względem czynników", horizontalalignment = 'center', verticalalignment = 'center', fontsize=12)
         self.scGlowny.axes.set_title("Wykres wyników firm względem czynników.")
+        self.scGlowny.axes.grid(axis = 'y',color = 'gray', linestyle='-', linewidth = 1)
         self.scGlowny.axes.legend()
         self.scGlowny.correct_ticks()
         layout.addWidget(self.scGlowny)
@@ -97,10 +98,16 @@ class MainWindow(Ui):
         for dane in self.dane_firm:
             wyniki.append(sum(dane[4]))
             labele.append(dane[0])
+        explode = []
+        dex = wyniki.index(max(wyniki))
+        for i in range(0,len(wyniki)):
+            if i == dex:
+                explode.append(0.05)
+            else:
+                explode.append(0.01)
         wyniki = np.array(wyniki)
         labele = np.array(labele)
-        self.scPie.axes.pie(x = wyniki,labels = labele, autopct='%1.1f%%')
-        #sc.axes.text(1,3.6,"Wyniki firm względem czynników", horizontalalignment = 'center', verticalalignment = 'center', fontsize=12)
+        self.scPie.axes.pie(x = wyniki,labels = labele, explode = explode, shadow = False, autopct='%1.1f%%')
         self.scPie.axes.set_title("Udział w wynikach każdej z firm")
         layout.addWidget(self.scPie)
         self.wykresPrawyDol.setLayout(layout)
@@ -122,10 +129,8 @@ class MainWindow(Ui):
         or if the file is already opened, sets focus to that
         excel window.
         '''
-        print(self.filepath)
         p = str(PureWindowsPath(self.filepath))
         command = "start " + "\"title\" " + "\"" + p + "\""
-        print(command)
         if not showexcel.show_excel_window(os.path.basename(self.filepath)):
             os.system(command)
 
@@ -143,7 +148,6 @@ class MainWindow(Ui):
         #options |= QtWidgets.QFileDialog.DontUseNativeDialog
         fileName, odd = QtWidgets.QFileDialog.getOpenFileName(self,"Wybierz dokument excel z danymi.", "Dane","Excel Files (*.xlsx)", options=options)
         if fileName != None:
-            print("none")
             return fileName
         else:
             return None 
