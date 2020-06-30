@@ -12,7 +12,7 @@ import matplotlib
 matplotlib.use('Qt5Agg')
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
-import numpy as np
+from numpy import array
 
 '''
 solution to not being able to save excel file while the program is running:
@@ -24,17 +24,11 @@ class MainWindow(Ui):
 
     '''
     here is a logic of a program
-    todo:
-    - handler for exception if someone clicks X when opening or saving a file
-    - handler for editing a workbook
-    - add function "addListeners" // not that important, but would add more readability
-
     '''
-    
-    flaga_istnieje_plik = False
-    flaga_stworzono_przykladowy = False
+    flag_file_exists = False
+    sample_xl_created_flag = False
     filepath = ""
-    dane_firm = []
+    input_data = []
 
     def __init__(self):
         super(MainWindow, self).__init__()
@@ -42,29 +36,29 @@ class MainWindow(Ui):
         self.filepath = "Dane.xlsx"
         data_file = Path("Dane.xlsx")
         if data_file.is_file():
-            self.flaga_istnieje_plik = True
-            self.dane_firm = f.full_import(self.filepath)
+            self.flag_file_exists = True
+            self.input_data = f.full_import(self.filepath)
             del data_file
         else:
             #tworzenie pliku
             x = f.daj_przykladowe_dane()
             f.exporter(x[0],x[1],x[2],x[3],x[4],x[5])
-            self.flaga_stworzono_przykladowy = True
-            self.flaga_istnieje_plik = True
+            self.sample_xl_created_flag = True
+            self.flag_file_exists = True
         #for x in self.dane_firm:
         #    print(x)
-        self.odswiez()
+        self.refresh()
         #self.workbook.close()
  
     
     #rysowanie_wykresow
-    def dodaj_wykres_glowny(self):
-        layout = self.wykresGlowny.layout()
+    def add_main_plot(self):
+        layout = self.mainPlot.layout()
         if layout != None:
-            QObjectCleanupHandler().add(self.wykresGlowny.layout())
+            QObjectCleanupHandler().add(self.mainPlot.layout())
         layout = QtWidgets.QVBoxLayout()
         self.scGlowny = MplCanvas(self)
-        for dane in self.dane_firm:
+        for dane in self.input_data:
             self.scGlowny.axes.plot(dane[1],dane[4],label = dane[0], linewidth = 4)
         #sc.axes.text(1,3.6,"Wyniki firm względem czynników", horizontalalignment = 'center', verticalalignment = 'center', fontsize=12)
         self.scGlowny.axes.set_title("Wykres wyników firm względem czynników.")
@@ -72,30 +66,30 @@ class MainWindow(Ui):
         self.scGlowny.axes.legend()
         self.scGlowny.correct_ticks()
         layout.addWidget(self.scGlowny)
-        self.wykresGlowny.setLayout(layout)
+        self.mainPlot.setLayout(layout)
 
-    def dodaj_wykres_prawy_gora(self):
-        Plotter.draw_and_print(self.dane_firm)
-        layout = self.wykresPrawyGora.layout()
+    def add_bar_chart(self):
+        Plotter.draw_and_print(self.input_data)
+        layout = self.barChart.layout()
         if layout != None:
-            QObjectCleanupHandler().add(self.wykresPrawyGora.layout())
+            QObjectCleanupHandler().add(self.barChart.layout())
         layout = QtWidgets.QVBoxLayout()
         label = QtWidgets.QLabel(self)
         pixmap = QPixmap('plt/bar_chart.png')
         pixmap = pixmap.scaled(451,331, Qt.KeepAspectRatio, Qt.FastTransformation)
         label.setPixmap(pixmap)
         layout.addWidget(label)
-        self.wykresPrawyGora.setLayout(layout)
+        self.barChart.setLayout(layout)
 
-    def dodaj_wykres_prawy_dolny(self):
-        layout = self.wykresPrawyDol.layout()
+    def add_pie_chart(self):
+        layout = self.pieChart.layout()
         if layout != None:
-            QObjectCleanupHandler().add(self.wykresPrawyDol.layout())
+            QObjectCleanupHandler().add(self.pieChart.layout())
         layout = QtWidgets.QVBoxLayout()
         self.scPie = MplCanvas(self)
         wyniki = []
         labele = []
-        for dane in self.dane_firm:
+        for dane in self.input_data:
             wyniki.append(sum(dane[4]))
             labele.append(dane[0])
         explode = []
@@ -105,25 +99,25 @@ class MainWindow(Ui):
                 explode.append(0.05)
             else:
                 explode.append(0.01)
-        wyniki = np.array(wyniki)
-        labele = np.array(labele)
+        wyniki = array(wyniki)
+        labele = array(labele)
         self.scPie.axes.pie(x = wyniki,labels = labele, explode = explode, shadow = False, autopct='%1.1f%%')
         self.scPie.axes.set_title("Udział w wynikach każdej z firm")
         layout.addWidget(self.scPie)
-        self.wykresPrawyDol.setLayout(layout)
+        self.pieChart.setLayout(layout)
             
-    def czytaj_dane(self):
-        self.dane_firm = [x for x in f.full_import(self.filepath)]
+    def read_data(self):
+        self.input_data = [x for x in f.full_import(self.filepath)]
 
-    def odswiez(self):
-        self.czytaj_dane()
-        self.dodaj_wykres_glowny()
-        self.dodaj_wykres_prawy_gora()
-        self.dodaj_wykres_prawy_dolny()
+    def refresh(self):
+        self.read_data()
+        self.add_main_plot()
+        self.add_bar_chart()
+        self.add_pie_chart()
         #self.dodaj_wykres_glowny()
         #self.dodaj_wykres_prawy_gora()
 
-    def edytuj_excel(self):
+    def edit_xl(self):
         '''
         opens excel file under the specified filename
         or if the file is already opened, sets focus to that
@@ -134,14 +128,14 @@ class MainWindow(Ui):
         if not showexcel.show_excel_window(os.path.basename(self.filepath)):
             os.system(command)
 
-    def otworz_wybrany_excel(self):
+    def open_given_xl(self):
         new_filepath = self.openExcelFileNameDialog()
         if new_filepath == None or new_filepath == "":
             pass
         else:
             self.filepath = new_filepath
             self.workbook = f.load_workbook(self.filepath)
-        self.odswiez()
+        self.refresh()
 
     def openExcelFileNameDialog(self):
         options = QtWidgets.QFileDialog.Options()
@@ -152,37 +146,30 @@ class MainWindow(Ui):
         else:
             return None 
     
-    def eksportuj_wykres_glowny(self):
-        filepath = self.saveWykresDialog("wykres_wyniki_czynniki")
+    def export_main_plot(self):
+        filepath = self.savePlotDialog("wykres_wyniki_czynniki")
         if filepath == None or filepath == "":
             return
         else:
-            Plotter.export_plot(self.dane_firm, filepath)
+            Plotter.export_plot(self.input_data, filepath)
 
-    def eksportuj_wykres_kolowy(self):
-        filepath = self.saveWykresDialog("wykres_kolowy")
+    def export_pie_chart(self):
+        filepath = self.savePlotDialog("wykres_kolowy")
         if filepath == None or filepath == "":
             return
         else:
-            Plotter.export_pie_chart(self.dane_firm, filepath)
+            Plotter.export_pie_chart(self.input_data, filepath)
 
-    def eksportuj_wykres_slupkowy(self):
-        filepath = self.saveWykresDialog("wykres_slupkowy")
+    def export_bar_chart(self):
+        filepath = self.savePlotDialog("wykres_slupkowy")
         if filepath == None or filepath == "":
             return
         else:
-            Plotter.export_bar_chart(self.dane_firm,filepath)
+            Plotter.export_bar_chart(self.input_data,filepath)
 
-    def zapisz_aktualny_arkusz(self):
-        '''
-        deprecated, do not use...
-        '''
-        savename = self.saveArkuszDialog()
-        self.workbook.save(savename)
-        
-    def saveWykresDialog(self, nazwa_pliku):
+    def savePlotDialog(self, filename):
         options = QtWidgets.QFileDialog.Options()
-        fileName, _ = QtWidgets.QFileDialog.getSaveFileName(self,"Zapisz wykres jako...",nazwa_pliku,"PNG files (*.png);; PDF files (*.pdf)", options=options)
+        fileName, _ = QtWidgets.QFileDialog.getSaveFileName(self,"Zapisz wykres jako...", filename,"PNG files (*.png);; PDF files (*.pdf)", options=options)
         return fileName
 
 class MplCanvas(FigureCanvas):
@@ -202,7 +189,7 @@ if __name__ == "__main__":
     app = QtWidgets.QApplication([])
     window = MainWindow()
     window.show()
-    if window.flaga_stworzono_przykladowy:
+    if window.sample_xl_created_flag:
         window.view_starting_popup()
     else:
         pass
