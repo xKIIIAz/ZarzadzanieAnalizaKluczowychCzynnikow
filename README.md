@@ -12,10 +12,10 @@ Program helping with CSF analisys, creates an excel workbook, with a template, h
 The figures are as follows:
 - The main plot - representing factors of every company
   
-<img src="plt/wykres_wyniki_czynniki.png" width="500">
+<p align="center"><img src="plt/wykres_wyniki_czynniki.png" width="500"></p>
 
 - The bar chart - representing the overall result of every company (ranking)
-<img src="plt/bar_chart.png" width="420">
+<p align="center"><img src="plt/bar_chart.png" width="420"></p>
 - The pie chart - representing the share of the sum of results of every company
-<img src="plt/wykres_kolowy.png" width="450">
+<p align="center"><img src="plt/wykres_kolowy.png" width="450"></p>
 
