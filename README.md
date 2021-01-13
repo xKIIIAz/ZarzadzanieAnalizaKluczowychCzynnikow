@@ -5,7 +5,7 @@ Program helping with CSF analisys, creates an excel workbook, with a template, h
 
 ---
 
-<img src="plt/akcs.png" width="550">
+<div style="text-align:center"><img src="./plt/akcs.jpg" width="550"></div>
 
 ---
 
