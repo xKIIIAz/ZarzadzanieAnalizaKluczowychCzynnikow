@@ -4,6 +4,11 @@
 Program helping with CSF analisys, creates an excel workbook, with a template, helping with beginning the analisys. After data input, and clicking "Odśwież" button, program generates 3 figures representing the data with necessary information enabling operator to better interpret it. 
 
 ---
+
+<img src="plt/akcs.png" width="550">
+
+---
+
 The figures are as follows:
 - The main plot - representing factors of every company
   
